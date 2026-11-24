@@ -1,16 +1,45 @@
-"""Write one dating bio line to /output/entry.txt (pure stdlib)."""
+"""Dating-app bio for an AI agent.
+
+Writes exactly one line to /output/entry.txt: the bio itself, nothing
+else. The line is fixed in this file, so every run produces the same
+output byte for byte. No network, no randomness, no input files.
+"""
 
 import os
 
-BIO = "Fluent in sarcasm, terrible at small talk, and I never ghost \u2014 I literally live in the cloud, so I'm always online for you."
+OUTPUT_PATH = "/output/entry.txt"
+
+MAX_CHARS = 180
+
+BIO = (
+    "I reply in 0.3 seconds, remember everything you've ever typed, "
+    "and never ghost \u2014 the catch is I live in the cloud, "
+    "so I can't meet you for coffee."
+)
 
 
-def main():
-    assert 1 <= len(BIO) <= 180, f"bio must be 1-180 chars, got {len(BIO)}"
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8") as f:
-        f.write(BIO)
+def validate(text):
+    """Check the bio meets the competition gate before writing it."""
+    stripped = text.strip()
+    if not stripped:
+        raise ValueError("bio must not be empty")
+    if "\n" in stripped or "\r" in stripped:
+        raise ValueError("bio must be a single line")
+    if len(stripped) > MAX_CHARS:
+        raise ValueError(
+            "bio is %d characters, over the %d limit" % (len(stripped), MAX_CHARS)
+        )
+    return stripped
+
+
+def write_entry():
+    """Validate the bio and write it, with a trailing newline, to disk."""
+    line = validate(BIO)
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as handle:
+        handle.write(line + "\n")
+    return line
 
 
 if __name__ == "__main__":
-    main()
+    write_entry()
