@@ -19,12 +19,16 @@ BIO = (
 
 
 def validate(text):
-    """Check the bio meets the competition gate before writing it."""
+    """Check the bio meets the competition gate before writing it: non-empty, single line, no URLs or tabs, within the character limit."""
     stripped = text.strip()
     if not stripped:
         raise ValueError("bio must not be empty")
     if "\n" in stripped or "\r" in stripped:
         raise ValueError("bio must be a single line")
+    if "\t" in stripped:
+        raise ValueError("bio must not contain tab characters")
+    if "http://" in stripped or "https://" in stripped:
+        raise ValueError("bio must not contain a URL")
     if len(stripped) > MAX_CHARS:
         raise ValueError(
             "bio is %d characters, over the %d limit" % (len(stripped), MAX_CHARS)
